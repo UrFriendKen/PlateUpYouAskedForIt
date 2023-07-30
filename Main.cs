@@ -1,8 +1,10 @@
-﻿using KitchenData;
+﻿using Kitchen;
+using KitchenData;
 using KitchenLib;
 using KitchenLib.Event;
 using KitchenLib.References;
 using KitchenMods;
+using PreferenceSystem;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -18,7 +20,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.0";
+        public const string MOD_VERSION = "0.1.1";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -27,8 +29,11 @@ namespace YouAskedForIt
 
         public static AssetBundle Bundle;
 
+        internal static PreferenceSystemManager PrefManager;
+
         public Main() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
+        public const string SERVING_BOARD_WASHING_ID = "servingBoardWashing";
         static ServingBoardDirty _servingBoardDirty;
 
         protected override void OnInitialise()
@@ -41,6 +46,7 @@ namespace YouAskedForIt
             LogInfo("Attempting to register game data...");
 
             _servingBoardDirty = AddGameDataObject<ServingBoardDirty>();
+            AddGameDataObject<KuluBin>();
 
             LogInfo("Done loading game data.");
         }
@@ -61,14 +67,29 @@ namespace YouAskedForIt
             // Register custom GDOs
             AddGameData();
 
+            PrefManager = new PreferenceSystemManager(MOD_GUID, MOD_NAME);
+            PrefManager
+                .AddLabel("Serving Board Requires Washing")
+                .AddInfo("Requires restart to take effect")
+                .AddOption<bool>(
+                    SERVING_BOARD_WASHING_ID,
+                    true,
+                    new bool[] { false, true },
+                    new string[] { "Disabled", "Enabled" });
+
+            PrefManager.RegisterMenu(PreferenceSystemManager.MenuType.PauseMenu);
+
             // Perform actions when game data is built
             Events.BuildGameDataEvent += delegate (object s, BuildGameDataEventArgs args)
             {
-                foreach (Item item in args.gamedata.Get<Item>())
+                if (PrefManager.Get<bool>(SERVING_BOARD_WASHING_ID))
                 {
-                    if ((item.DirtiesTo?.ID ?? 0) == ItemReferences.ServingBoard)
+                    foreach (Item item in args.gamedata.Get<Item>())
                     {
-                        item.DirtiesTo = _servingBoardDirty.GameDataObject;
+                        if ((item.DirtiesTo?.ID ?? 0) == ItemReferences.ServingBoard)
+                        {
+                            item.DirtiesTo = _servingBoardDirty.GameDataObject;
+                        }
                     }
                 }
             };
