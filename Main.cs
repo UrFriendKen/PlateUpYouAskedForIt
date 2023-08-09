@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using YouAskedForIt.Customs;
+using YouAskedForIt.Utils;
 
 // Namespace should have "Kitchen" in the beginning
 namespace YouAskedForIt
@@ -20,7 +21,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.1";
+        public const string MOD_VERSION = "0.1.2";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -36,9 +37,13 @@ namespace YouAskedForIt
         public const string SERVING_BOARD_WASHING_ID = "servingBoardWashing";
         static ServingBoardDirty _servingBoardDirty;
 
+        public const string WRONG_DELIVERY_EXPLOSION_ID = "wrongDeliveryExplosion";
+        public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
+        internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
+        internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
+
         protected override void OnInitialise()
         {
-            LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
         }
 
         private void AddGameData()
@@ -57,6 +62,7 @@ namespace YouAskedForIt
 
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
+            LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
             // TODO: Uncomment the following if you have an asset bundle.
             // TODO: Also, make sure to set EnableAssetBundleDeploy to 'true' in your ModName.csproj
 
@@ -73,9 +79,30 @@ namespace YouAskedForIt
                 .AddInfo("Requires restart to take effect")
                 .AddOption<bool>(
                     SERVING_BOARD_WASHING_ID,
-                    true,
+                    false,
                     new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" });
+                    new string[] { "Disabled", "Enabled" })
+
+                .AddLabel("Wrong Item Delivery Breaks Table")
+                .AddOption<bool>(
+                    WRONG_DELIVERY_EXPLOSION_ID,
+                    false,
+                    new bool[] { false, true },
+                    new string[] { "Disabled", "Enabled" })
+                
+                .AddSpacer()
+                .AddSubmenu("Sound Effects Volume", "soundEffectsVolume")
+                    .AddLabel("Table Explosion")
+                    .AddOption<float>(
+                        SOUND_EFFECTS_EXPLOSION_VOLUME_ID,
+                        0.5f,
+                        new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f },
+                        new string[] { "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" })
+                    .AddSpacer()
+                    .AddSpacer()
+                .SubmenuDone()
+                .AddSpacer()
+                .AddSpacer();
 
             PrefManager.RegisterMenu(PreferenceSystemManager.MenuType.PauseMenu);
 
