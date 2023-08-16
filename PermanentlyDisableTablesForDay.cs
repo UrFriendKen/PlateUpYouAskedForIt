@@ -3,11 +3,15 @@ using KitchenData;
 using KitchenMods;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Entities;
 
 namespace YouAskedForIt
 {
+    [StructLayout(LayoutKind.Sequential, Size = 1)]
+    public struct CExplodedTable : IComponentData, IModComponent { }
+
     public class PermanentlyDisableTablesForDay : DaySystem, IModSystem
     {
         EntityQuery Groups;
@@ -92,6 +96,7 @@ namespace YouAskedForIt
                     Set<CGroupStateChanged>(entity);
                     settings.AddPatience(ref patience, settings.Patience.ItemDeliverBonus);
                     Set(entity, patience);
+                    Set<CExplodedTable>(assignedTable);
                     Set<CIsBroken>(assignedTable);
                     break;
                 }
@@ -145,6 +150,25 @@ namespace YouAskedForIt
             if (items.Select(x => x.AlwaysOrderAdditionalItem).Where(x => x != 0).Distinct().Contains(itemID))
                 return true;
             return false;
+        }
+    }
+
+    public class UnbreakTablesAtNight : NightSystem, IModSystem
+    {
+        EntityQuery BrokenTables;
+
+        protected override void Initialise()
+        {
+            base.Initialise();
+            BrokenTables = GetEntityQuery(new QueryHelper()
+                .All(typeof(CExplodedTable), typeof(CIsBroken)));
+        }
+
+        protected override void OnUpdate()
+        {
+            using NativeArray<Entity> entities = BrokenTables.ToEntityArray(Allocator.Temp);
+            EntityManager.RemoveComponent<CExplodedTable>(entities);
+            EntityManager.RemoveComponent<CIsBroken>(entities);
         }
     }
 }

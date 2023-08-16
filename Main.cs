@@ -7,6 +7,7 @@ using KitchenMods;
 using PreferenceSystem;
 using System.Linq;
 using System.Reflection;
+using TMPro;
 using UnityEngine;
 using YouAskedForIt.Customs;
 using YouAskedForIt.Utils;
@@ -21,7 +22,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.2";
+        public const string MOD_VERSION = "0.1.4";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -116,6 +117,45 @@ namespace YouAskedForIt
                         if ((item.DirtiesTo?.ID ?? 0) == ItemReferences.ServingBoard)
                         {
                             item.DirtiesTo = _servingBoardDirty.GameDataObject;
+                        }
+                    }
+                }
+
+                if (args.gamedata.TryGet(-233558851, out Appliance garageDecorations))
+                {
+                    if (!garageDecorations.Properties.Select(x => x.GetType()).Contains(typeof(CCrateCountMarker)))
+                    {
+                        garageDecorations.Properties.Add(new CCrateCountMarker());
+                    }
+
+                    string crateCountTextName = "Crate Count Text";
+                    Transform gameObjectTransform = garageDecorations.Prefab?.transform.Find("GameObject");
+                    if (gameObjectTransform != null && gameObjectTransform.Find(crateCountTextName) == null)
+                    {
+                        GameObject loadingBayText = gameObjectTransform.Find("Loading Bay Text")?.gameObject;
+                        if (loadingBayText != null)
+                        {
+                            GameObject crateCountText = GameObject.Instantiate(loadingBayText);
+                            crateCountText.name = crateCountTextName;
+                            crateCountText.transform.SetParent(gameObjectTransform.transform, false);
+                            crateCountText.transform.Reset();
+                            crateCountText.transform.localPosition = new Vector3(1.2f, 0.06f, -1.7f);
+                            crateCountText.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                            crateCountText.transform.localScale = Vector3.one * 0.01f;
+
+                            AutoGlobalLocal autoGlobalLocal = crateCountText.GetComponent<AutoGlobalLocal>();
+                            if (autoGlobalLocal != null)
+                            {
+                                Component.DestroyImmediate(autoGlobalLocal);
+                            }
+
+                            CrateCountView crateCountView = crateCountText.AddComponent<CrateCountView>();
+                            TextMeshPro tmp = crateCountText.GetComponent<TextMeshPro>();
+                            if (tmp != null)
+                            {
+                                crateCountView.Text = tmp;
+                                tmp.text = "";
+                            }
                         }
                     }
                 }
