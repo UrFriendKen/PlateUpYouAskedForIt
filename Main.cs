@@ -22,7 +22,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.4";
+        public const string MOD_VERSION = "0.1.5";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -42,6 +42,7 @@ namespace YouAskedForIt
         public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
+        internal static readonly ViewType FlourEmitterViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:FlourEmitter");
 
         protected override void OnInitialise()
         {
@@ -84,7 +85,7 @@ namespace YouAskedForIt
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
 
-                .AddLabel("Wrong Item Delivery Breaks Table")
+                .AddLabel("Wrong Velocities Delivery Breaks Table")
                 .AddOption<bool>(
                     WRONG_DELIVERY_EXPLOSION_ID,
                     false,

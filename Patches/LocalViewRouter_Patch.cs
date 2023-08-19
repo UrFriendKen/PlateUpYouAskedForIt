@@ -63,6 +63,24 @@ namespace YouAskedForIt.Patches
                 __result = explosionSoundInstance;
                 return false;
             }
+
+            if (view_type == Main.FlourEmitterViewType)
+            {
+                GameObject flourEmitterPrefab = Main.Bundle.LoadAsset<GameObject>("FlourEmitterParticleSystem");
+                if (flourEmitterPrefab != null)
+                {
+                    GameObject flourEmitterInstance = GameObject.Instantiate(flourEmitterPrefab);
+                    flourEmitterInstance.transform.SetParent(Container);
+
+                    ParticleEmitterView flourEmitter = flourEmitterInstance.AddComponent<ParticleEmitterView>();
+                    flourEmitter.Emitter = flourEmitterInstance.GetComponent<ParticleSystem>();
+
+                    Prefabs.Add(view_type, flourEmitterInstance);
+                    __result = flourEmitterInstance;
+                    return false;
+                }
+            }
+
             return true;
         }
     }
