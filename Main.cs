@@ -22,7 +22,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.5";
+        public const string MOD_VERSION = "0.1.6";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -54,6 +54,7 @@ namespace YouAskedForIt
 
             _servingBoardDirty = AddGameDataObject<ServingBoardDirty>();
             AddGameDataObject<KuluBin>();
+            AddGameDataObject<HeadLettuce>();
 
             LogInfo("Done loading game data.");
         }
