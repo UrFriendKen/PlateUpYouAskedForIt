@@ -5,6 +5,7 @@ using KitchenLib.Event;
 using KitchenLib.References;
 using KitchenMods;
 using PreferenceSystem;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TMPro;
@@ -22,7 +23,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.6";
+        public const string MOD_VERSION = "0.1.7";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -39,6 +40,7 @@ namespace YouAskedForIt
         static ServingBoardDirty _servingBoardDirty;
 
         public const string WRONG_DELIVERY_EXPLOSION_ID = "wrongDeliveryExplosion";
+        public const string DESTROY_PROTECTORS_ON_FIRE_ID = "destroyProtectorsOnFire";
         public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
@@ -63,6 +65,14 @@ namespace YouAskedForIt
         {
         }
 
+        private HashSet<int> AppliancesDestroyIfOnFireAtNight = new HashSet<int>()
+        {
+            -648349801, // Rug
+            591400026,  // Cosy Rug
+            2076966627, // Fancy Rug
+            1765889988  // Floor Protector
+        };
+
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
             LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
@@ -78,6 +88,19 @@ namespace YouAskedForIt
 
             PrefManager = new PreferenceSystemManager(MOD_GUID, MOD_NAME);
             PrefManager
+
+                .AddLabel("Wrong Delivery Breaks Table")
+                .AddOption<bool>(
+                    WRONG_DELIVERY_EXPLOSION_ID,
+                    false,
+                    new bool[] { false, true },
+                    new string[] { "Disabled", "Enabled" })
+                .AddLabel("Destroy Rugs and Floor Protectors If On Fire At End of Day")
+                .AddOption<bool>(
+                    DESTROY_PROTECTORS_ON_FIRE_ID,
+                    false,
+                    new bool[] { false, true },
+                    new string[] { "Disabled", "Enabled" })
                 .AddLabel("Serving Board Requires Washing")
                 .AddInfo("Requires restart to take effect")
                 .AddOption<bool>(
@@ -85,14 +108,6 @@ namespace YouAskedForIt
                     false,
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
-
-                .AddLabel("Wrong Velocities Delivery Breaks Table")
-                .AddOption<bool>(
-                    WRONG_DELIVERY_EXPLOSION_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" })
-                
                 .AddSpacer()
                 .AddSubmenu("Sound Effects Volume", "soundEffectsVolume")
                     .AddLabel("Table Explosion")
@@ -157,6 +172,17 @@ namespace YouAskedForIt
                             {
                                 crateCountView.Text = tmp;
                                 tmp.text = "";
+                            }
+                        }
+                    }
+
+                    foreach (int applianceID in AppliancesDestroyIfOnFireAtNight)
+                    {
+                        if (args.gamedata.TryGet(applianceID, out Appliance appliance, warn_if_fail: true))
+                        {
+                            if (!appliance.Properties.Select(x => x.GetType()).Contains(typeof(CDestroyIfOnFireAtNight)))
+                            {
+                                appliance.Properties.Add(new CDestroyIfOnFireAtNight());
                             }
                         }
                     }
