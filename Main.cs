@@ -23,7 +23,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.7";
+        public const string MOD_VERSION = "0.1.8";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -42,6 +42,8 @@ namespace YouAskedForIt
         public const string WRONG_DELIVERY_EXPLOSION_ID = "wrongDeliveryExplosion";
         public const string DESTROY_PROTECTORS_ON_FIRE_ID = "destroyProtectorsOnFire";
         public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
+        public const string REHEARSAL_TIME_ID = "rehearsalTime";
+        internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
         internal static readonly ViewType FlourEmitterViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:FlourEmitter");
@@ -101,6 +103,12 @@ namespace YouAskedForIt
                     false,
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
+                .AddLabel("Practice Mode Text")
+                .AddOption<bool>(
+                    REHEARSAL_TIME_ID,
+                    false,
+                    new bool[] { false, true },
+                    new string[] { "Default", "It's Rehearsal Time!" })
                 .AddLabel("Serving Board Requires Washing")
                 .AddInfo("Requires restart to take effect")
                 .AddOption<bool>(
