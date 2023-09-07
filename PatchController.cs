@@ -22,6 +22,12 @@ namespace YouAskedForIt
             return _instance?.Has<T>(e) ?? false;
         }
 
+        internal static bool StaticRequire<T>(Entity e, out T comp) where T : struct, IComponentData
+        {
+            comp = default;
+            return _instance?.Require(e, out comp) ?? false;
+        }
+
         internal static bool StaticRemove<T>(Entity e) where T : struct, IComponentData
         {
             if (StaticHas<T>(e) && _instance.EntityManager != null)
