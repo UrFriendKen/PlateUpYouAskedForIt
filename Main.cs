@@ -23,7 +23,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.10";
+        public const string MOD_VERSION = "0.1.11";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -44,6 +44,7 @@ namespace YouAskedForIt
         public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
         public const string REHEARSAL_TIME_ID = "rehearsalTime";
         public const string RANDOMLY_ROTATE_ICE_CREAM_ID = "randomlyRotateIceCream";
+        public const string REVERSE_PROGRESS_BARS_ID = "reverseProgressBars";
         internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
@@ -91,7 +92,9 @@ namespace YouAskedForIt
 
             PrefManager = new PreferenceSystemManager(MOD_GUID, MOD_NAME);
             PrefManager
-
+                .AddLabel("You Asked For It!")
+                .AddSpacer()
+                .AddConditionalBlocker(() => Session.CurrentGameNetworkMode != GameNetworkMode.Host)
                 .AddLabel("Wrong Delivery Breaks Table")
                 .AddOption<bool>(
                     WRONG_DELIVERY_EXPLOSION_ID,
@@ -104,12 +107,6 @@ namespace YouAskedForIt
                     false,
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
-                .AddLabel("Practice Mode Text")
-                .AddOption<bool>(
-                    REHEARSAL_TIME_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Default", "It's Rehearsal Time!" })
                 .AddLabel("Randomly Rotate Ice Cream")
                 .AddOption<bool>(
                     RANDOMLY_ROTATE_ICE_CREAM_ID,
@@ -124,14 +121,27 @@ namespace YouAskedForIt
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
                 .AddSpacer()
-                .AddSubmenu("Sound Effects Volume", "soundEffectsVolume")
-                    .AddLabel("Table Explosion")
+                .ConditionalBlockerDone()
+                .AddSubmenu("Client Settings", "clientSettings")
+                    .AddLabel("Client Settings")
+                    .AddLabel("Table Explosion Volume")
                     .AddOption<float>(
                         SOUND_EFFECTS_EXPLOSION_VOLUME_ID,
                         0.5f,
                         new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f },
                         new string[] { "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" })
-                    .AddSpacer()
+                    .AddLabel("Practice Mode Text")
+                    .AddOption<bool>(
+                        REHEARSAL_TIME_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Default", "It's Rehearsal Time!" })
+                    .AddLabel("Reverse Progress Bars >:)")
+                    .AddOption<bool>(
+                        REVERSE_PROGRESS_BARS_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "Enabled" })
                     .AddSpacer()
                 .SubmenuDone()
                 .AddSpacer()
