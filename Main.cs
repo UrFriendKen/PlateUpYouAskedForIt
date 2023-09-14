@@ -3,6 +3,7 @@ using KitchenData;
 using KitchenLib;
 using KitchenLib.Event;
 using KitchenLib.References;
+using KitchenLib.Utils;
 using KitchenMods;
 using PreferenceSystem;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.11";
+        public const string MOD_VERSION = "0.1.12";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -211,6 +212,15 @@ namespace YouAskedForIt
                             }
                         }
                     }
+                }
+
+                if (args.gamedata.TryGet(-110929446, out Item scrubbingBrush))
+                {
+                    scrubbingBrush.Prefab = Bundle.LoadAsset<GameObject>("Potato Brush");
+                    MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "ScrubbingBrush", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Blue"), MaterialUtils.GetExistingMaterial("Mop") });
+                    MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "Potato", new Material[] { MaterialUtils.GetExistingMaterial("Raw Potato - Skin") });
+                    MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "FaceAnchor/TootieFace/Face", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Black") });
+                    MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "FaceAnchor/TootieFace/Tongue", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Red") });
                 }
             };
         }
