@@ -37,5 +37,26 @@ namespace YouAskedForIt
             }
             return false;
         }
+
+        internal static bool StaticHasBuffer<T>(Entity e) where T : struct, IBufferElementData
+        {
+            return _instance?.HasBuffer<T>(e) ?? false;
+        }
+
+        internal static bool StaticRequireBuffer<T>(Entity e, out DynamicBuffer<T> buffer) where T : struct, IBufferElementData
+        {
+            buffer = default;
+            return _instance?.RequireBuffer<T>(e, out buffer) ?? false;
+        }
+
+        internal static void StaticSet<T>(Entity e, T comp) where  T : struct, IComponentData
+        {
+            _instance?.Set(e, comp);
+        }
+
+        internal static void StaticSet<T>(Entity e) where T : struct, IComponentData
+        {
+            _instance?.Set<T>(e);
+        }
     }
 }
