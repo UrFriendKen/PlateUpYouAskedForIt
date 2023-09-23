@@ -24,7 +24,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.13";
+        public const string MOD_VERSION = "0.1.14";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -144,7 +144,7 @@ namespace YouAskedForIt
                         false,
                         new bool[] { false, true },
                         new string[] { "Default", "It's Rehearsal Time!" })
-                    .AddLabel("Reverse Progress Bars >:)")
+                    .AddLabel("Reverse Patience/Progress Bars >:)")
                     .AddOption<bool>(
                         REVERSE_PROGRESS_BARS_ID,
                         false,
