@@ -24,7 +24,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.14";
+        public const string MOD_VERSION = "0.1.15";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -34,7 +34,7 @@ namespace YouAskedForIt
         public static AssetBundle Bundle;
 
         internal static PreferenceSystemManager PrefManager;
-
+         
         public Main() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
         public const string SERVING_BOARD_WASHING_ID = "servingBoardWashing";
@@ -63,6 +63,8 @@ namespace YouAskedForIt
             _servingBoardDirty = AddGameDataObject<ServingBoardDirty>();
             AddGameDataObject<KuluBin>();
             AddGameDataObject<HeadLettuce>();
+            AddGameDataObject<GlutenFreeWiener>();
+            AddGameDataObject<BurnDayBanner>();
 
             LogInfo("Done loading game data.");
         }
