@@ -24,7 +24,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.15";
+        public const string MOD_VERSION = "0.1.16";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -230,6 +230,19 @@ namespace YouAskedForIt
                     MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "Potato", new Material[] { MaterialUtils.GetExistingMaterial("Raw Potato - Skin") });
                     MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "FaceAnchor/TootieFace/Face", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Black") });
                     MaterialUtils.ApplyMaterial(scrubbingBrush.Prefab, "FaceAnchor/TootieFace/Tongue", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Red") });
+                }
+
+                int[] makeStackable = new int[]
+                {
+                    -1660145659,    // Bin Bag
+                    895813906       // Flammable Bin Bag
+                };
+                foreach (int id in makeStackable)
+                {
+                    if (args.gamedata.TryGet(id, out Item item))
+                    {
+                        item.ItemStorageFlags |= ItemStorage.StackableFood;
+                    }
                 }
             };
         }
