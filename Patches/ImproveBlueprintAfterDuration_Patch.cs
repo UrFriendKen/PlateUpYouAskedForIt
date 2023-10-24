@@ -18,9 +18,14 @@ namespace YouAskedForIt.Patches
         }
 
         [HarmonyPrefix]
-        static bool OriginalLambdaBody_Prefix(Entity desk, ref EntityCommandBuffer ___ecb, ref CDeskTarget target, ref CTakesDuration duration, in CModifyBlueprintStoreAfterDuration improvement, ref ComponentDataFromEntity<CBlueprintStore> ____ComponentDataFromEntity_CBlueprintStore_0)
+        static bool OriginalLambdaBody_Prefix(Entity desk, ref EntityCommandBuffer ___ecb, ref CDeskTarget target, ref CTakesDuration duration, ref ComponentDataFromEntity<CBlueprintStore> ____ComponentDataFromEntity_CBlueprintStore_0)
         {
-            if (!duration.Active || duration.Remaining > 0f || !PatchController.StaticRequire(target.Target, out CBlueprintStore comp) || !comp.InUse || !GameData.Main.TryGet(comp.ApplianceID, out Item _))
+            if (!duration.Active ||
+                duration.Remaining > 0f ||
+                !PatchController.StaticRequire(target.Target, out CBlueprintStore comp) ||
+                !comp.InUse ||
+                !GameData.Main.TryGet(comp.ApplianceID, out Item _) ||
+                !PatchController.StaticRequire(desk, out CModifyBlueprintStoreAfterDuration improvement))
 			{
                 return true;
             }
