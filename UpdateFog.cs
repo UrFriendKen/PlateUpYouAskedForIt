@@ -23,6 +23,11 @@ namespace YouAskedForIt
 
         protected override void OnUpdate()
         {
+            bool fogEnabled = Main.PrefManager.Get<bool>(Main.FOG_OF_WAR_ID);
+            float sameRoomRadius = Main.PrefManager.Get<float>(Main.FOG_OF_WAR_SAME_ROOM_RADIUS_ID);
+            float otherRoomRadius = Main.PrefManager.Get<float>(Main.FOG_OF_WAR_OTHER_ROOM_RADIUS_ID);
+            otherRoomRadius = Mathf.Min(sameRoomRadius, otherRoomRadius);
+
             using NativeArray<CPlayer> players = Players.ToComponentDataArray<CPlayer>(Allocator.Temp);
             using NativeArray<CPosition> playerPositions = Players.ToComponentDataArray<CPosition>(Allocator.Temp);
 
@@ -35,7 +40,9 @@ namespace YouAskedForIt
                 CFog fog = fogs[i];
                 CPosition fogPosition = fogPositions[i];
 
-                fog.Enabled = Main.PrefManager.Get<bool>(Main.FOG_OF_WAR_ID);
+                fog.Enabled = fogEnabled;
+                fog.SameRoomRevealDist = sameRoomRadius;
+                fog.AlwaysRevealDist = otherRoomRadius;
                 Set(entity, fog);
 
                 if (!fog.Enabled || !RequireBuffer(entity, out DynamicBuffer<CFogInRangePlayer> fogPlayers))

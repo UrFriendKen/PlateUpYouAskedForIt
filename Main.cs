@@ -24,7 +24,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.18";
+        public const string MOD_VERSION = "0.1.19";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -48,6 +48,8 @@ namespace YouAskedForIt
         public const string REVERSE_PROGRESS_BARS_ID = "reverseProgressBars";
         public const string SIMPLICITY_BOOKING_DESK_ID = "simplicityBookingDesk";
         public const string FOG_OF_WAR_ID = "fogOfWar";
+        public const string FOG_OF_WAR_SAME_ROOM_RADIUS_ID = "fogOfWarSameRoomRadius";
+        public const string FOG_OF_WAR_OTHER_ROOM_RADIUS_ID = "fogOfWarOtherRoomRadius";
         internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
@@ -125,12 +127,27 @@ namespace YouAskedForIt
                     false,
                     new bool[] { false, true },
                     new string[] { "Disabled", "Enabled" })
-                .AddLabel("Fog Of War")
-                .AddOption<bool>(
-                    FOG_OF_WAR_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" })
+                .AddSpacer()
+                .AddSubmenu("Fog Of War", "fogOfwar")
+                    .AddLabel("Fog Of War")
+                    .AddOption<bool>(
+                        FOG_OF_WAR_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "Enabled" })
+                    .AddLabel("Same Room Radius")
+                    .AddOption<float>(
+                        FOG_OF_WAR_SAME_ROOM_RADIUS_ID,
+                        3f,
+                        new float[] { 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
+                        new string[] { "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
+                    .AddLabel("Other Room Radius")
+                    .AddOption<float>(
+                        FOG_OF_WAR_OTHER_ROOM_RADIUS_ID,
+                        1.5f,
+                        new float[] { 0f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
+                        new string[] { "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
+                .SubmenuDone()
                 .AddLabel("Serving Board Requires Washing")
                 .AddInfo("Requires restart to take effect")
                 .AddOption<bool>(

@@ -1,6 +1,7 @@
 ﻿using Kitchen;
 using KitchenMods;
 using Unity.Entities;
+using UnityEngine;
 
 namespace YouAskedForIt
 {
@@ -29,6 +30,9 @@ namespace YouAskedForIt
 
         protected override void OnUpdate()
         {
+            float sameRoomRadius = Main.PrefManager.Get<float>(Main.FOG_OF_WAR_SAME_ROOM_RADIUS_ID);
+            float otherRoomRadius = Main.PrefManager.Get<float>(Main.FOG_OF_WAR_OTHER_ROOM_RADIUS_ID);
+
             DynamicBuffer<CLayoutRoomTile> tiles = Tiles;
             for (int i = 0; i < tiles.Length; i++)
             {
@@ -36,8 +40,8 @@ namespace YouAskedForIt
                 Entity entity = EntityManager.CreateEntity(typeof(CFog), typeof(CPosition), typeof(CFogInRangePlayer), typeof(CRequiresView));
                 Set(entity, new CFog()
                 {
-                    SameRoomRevealDist = 3f,
-                    AlwaysRevealDist = 1.5f
+                    SameRoomRevealDist = sameRoomRadius,
+                    AlwaysRevealDist = Mathf.Min(sameRoomRadius, otherRoomRadius)
                 });
                 Set(entity, new CPosition(tile.Position));
                 Set(entity, default(CDoNotPersist));
