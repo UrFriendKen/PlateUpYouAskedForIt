@@ -2,6 +2,7 @@
 using Kitchen;
 using Kitchen.Components;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
 using YouAskedForIt.Utils;
 
@@ -77,6 +78,23 @@ namespace YouAskedForIt.Patches
 
                     Prefabs.Add(view_type, flourEmitterInstance);
                     __result = flourEmitterInstance;
+                    return false;
+                }
+            }
+
+            if (view_type == Main.FogViewType)
+            {
+                GameObject fogPrefab = Main.Bundle.LoadAsset<GameObject>("Fog");
+                if (fogPrefab != null)
+                {
+                    GameObject fogPrefabInstance = GameObject.Instantiate(fogPrefab);
+                    fogPrefabInstance.transform.SetParent(Container);
+
+                    FogView fogView = fogPrefabInstance.AddComponent<FogView>();
+                    fogView.Fog = fogPrefabInstance.transform.Find("Particle System")?.gameObject;
+
+                    Prefabs.Add(view_type, fogPrefabInstance);
+                    __result = fogPrefabInstance;
                     return false;
                 }
             }
