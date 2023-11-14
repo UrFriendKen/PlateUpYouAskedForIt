@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kitchen;
 using Kitchen.Components;
+using KitchenLib.Utils;
 using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
@@ -85,18 +86,31 @@ namespace YouAskedForIt.Patches
             if (view_type == Main.FogViewType)
             {
                 GameObject fogPrefab = Main.Bundle.LoadAsset<GameObject>("Fog");
-                if (fogPrefab != null)
+                GameObject fogPrefabInstance = fogPrefab != null ? GameObject.Instantiate(fogPrefab) : new GameObject("Backup Fog");
+                fogPrefabInstance.transform.SetParent(Container);
+                fogPrefabInstance.transform.Reset();
+
+                GameObject errorFog = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                errorFog.name = "Fog Error";
+                errorFog.transform.SetParent(fogPrefabInstance.transform);
+                errorFog.transform.Reset();
+                errorFog.transform.localPosition = Vector3.up * 0.9f;
+                errorFog.transform.localScale = new Vector3(1.2f, 1.8f, 1.2f);
+                errorFog.SetActive(false);
+                
+                Collider[] colliders = errorFog.GetComponentsInChildren<Collider>();
+                for (int i = colliders.Length - 1; i > -1; i--)
                 {
-                    GameObject fogPrefabInstance = GameObject.Instantiate(fogPrefab);
-                    fogPrefabInstance.transform.SetParent(Container);
-
-                    FogView fogView = fogPrefabInstance.AddComponent<FogView>();
-                    fogView.Fog = fogPrefabInstance.transform.Find("Particle System")?.gameObject;
-
-                    Prefabs.Add(view_type, fogPrefabInstance);
-                    __result = fogPrefabInstance;
-                    return false;
+                    Component.DestroyImmediate(colliders[i]);
                 }
+                
+                MaterialUtils.ApplyMaterial(errorFog, "", new Material[] { MaterialUtils.GetExistingMaterial("Plastic - Black Dark") });
+                FogView fogView = fogPrefabInstance.AddComponent<FogView>();
+                fogView.ErrorFog = errorFog;
+
+                Prefabs.Add(view_type, fogPrefabInstance);
+                __result = fogPrefabInstance;
+                return false;
             }
 
             return true;

@@ -2,6 +2,7 @@
 using Kitchen;
 using KitchenMods;
 using MessagePack;
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
@@ -11,6 +12,12 @@ namespace YouAskedForIt
 {
     public class FogView : UpdatableObjectView<FogView.ViewData>
     {
+        public enum Quality
+        {
+            Static,
+            Animated
+        }
+
         public class UpdateView : IncrementalViewSystemBase<ViewData>, IModSystem
         {
             EntityQuery Views;
@@ -70,12 +77,53 @@ namespace YouAskedForIt
             }
         }
 
-        public GameObject Fog;
+        public Dictionary<Quality, GameObject> Fogs;
+
+        public GameObject ErrorFog;
+
+        private Quality _prevQuality = Quality.Animated;
+
+        private Quality CurrentQuality => Enum.TryParse(Main.PrefManager.Get<string>(Main.FOG_OF_WAR_QUALITY_ID), out Quality prefQuality) ? prefQuality : Quality.Static;
+
+        private void InitFog()
+        {
+            if (Fogs == null)
+            {
+                Fogs = new Dictionary<FogView.Quality, GameObject>()
+                {
+                    { FogView.Quality.Static, transform.Find("Particle System Low")?.gameObject ?? ErrorFog },
+                    { FogView.Quality.Animated, transform.Find("Particle System")?.gameObject ?? ErrorFog },
+                };
+            }
+        }
+
+        private void Update()
+        {
+            Quality quality = CurrentQuality;
+            if (quality != _prevQuality)
+            {
+                if (Fogs[_prevQuality]?.gameObject.activeSelf ?? false)
+                {
+                    foreach (KeyValuePair<Quality, GameObject> kvp in Fogs)
+                    {
+                        kvp.Value?.SetActive(kvp.Key == quality);
+                    }
+                }
+                _prevQuality = quality;
+            }
+
+        }
 
         protected override void UpdateData(ViewData data)
         {
+            InitFog();
+
+            Quality quality = CurrentQuality;
             bool isActive = data.Enabled && !data.InputSourcesInRange.Contains(InputSourceIdentifier.Identifier.Value);
-            Fog?.SetActive(isActive);
+            foreach (KeyValuePair<Quality, GameObject> kvp in Fogs)
+            {
+                kvp.Value?.SetActive(isActive && kvp.Key == quality);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using KitchenLib.References;
 using KitchenLib.Utils;
 using KitchenMods;
 using PreferenceSystem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using YouAskedForIt.Customs;
 using YouAskedForIt.Utils;
+using System.Linq;
 
 // Namespace should have "Kitchen" in the beginning
 namespace YouAskedForIt
@@ -24,7 +26,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.19";
+        public const string MOD_VERSION = "0.1.20";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -50,6 +52,7 @@ namespace YouAskedForIt
         public const string FOG_OF_WAR_ID = "fogOfWar";
         public const string FOG_OF_WAR_SAME_ROOM_RADIUS_ID = "fogOfWarSameRoomRadius";
         public const string FOG_OF_WAR_OTHER_ROOM_RADIUS_ID = "fogOfWarOtherRoomRadius";
+        public const string FOG_OF_WAR_QUALITY_ID = "fogOfWarQuality";
         internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
@@ -87,6 +90,7 @@ namespace YouAskedForIt
 
         protected override void OnPostActivate(KitchenMods.Mod mod)
         {
+            Main.LogWarning("You Asked For It Test");
             LogWarning($"{MOD_GUID} v{MOD_VERSION} in use!");
             // TODO: Uncomment the following if you have an asset bundle.
             // TODO: Also, make sure to set EnableAssetBundleDeploy to 'true' in your ModName.csproj
@@ -97,6 +101,7 @@ namespace YouAskedForIt
 
             // Register custom GDOs
             AddGameData();
+            Main.LogWarning("You Asked For It Test");
 
             PrefManager = new PreferenceSystemManager(MOD_GUID, MOD_NAME);
             PrefManager
@@ -165,6 +170,12 @@ namespace YouAskedForIt
                         0.5f,
                         new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f },
                         new string[] { "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" })
+                    .AddLabel("Fog Of War Display")
+                    .AddOption<string>(
+                        FOG_OF_WAR_QUALITY_ID,
+                        FogView.Quality.Animated.ToString(),
+                        Enum.GetNames(typeof(FogView.Quality)),
+                        Enum.GetNames(typeof(FogView.Quality)))
                     .AddLabel("Practice Mode Text")
                     .AddOption<bool>(
                         REHEARSAL_TIME_ID,
@@ -181,7 +192,6 @@ namespace YouAskedForIt
                 .SubmenuDone()
                 .AddSpacer()
                 .AddSpacer();
-
             PrefManager.RegisterMenu(PreferenceSystemManager.MenuType.PauseMenu);
 
             // Perform actions when game data is built
