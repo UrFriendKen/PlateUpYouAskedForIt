@@ -39,20 +39,21 @@ namespace YouAskedForIt
          
         public Main() : base(MOD_GUID, MOD_NAME, MOD_AUTHOR, MOD_VERSION, MOD_GAMEVERSION, Assembly.GetExecutingAssembly()) { }
 
-        public const string SERVING_BOARD_WASHING_ID = "servingBoardWashing";
+        internal const string SERVING_BOARD_WASHING_ID = "servingBoardWashing";
         static ServingBoardDirty _servingBoardDirty;
 
-        public const string WRONG_DELIVERY_EXPLOSION_ID = "wrongDeliveryExplosion";
-        public const string DESTROY_PROTECTORS_ON_FIRE_ID = "destroyProtectorsOnFire";
-        public const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
-        public const string REHEARSAL_TIME_ID = "rehearsalTime";
-        public const string RANDOMLY_ROTATE_ICE_CREAM_ID = "randomlyRotateIceCream";
-        public const string REVERSE_PROGRESS_BARS_ID = "reverseProgressBars";
-        public const string SIMPLICITY_BOOKING_DESK_ID = "simplicityBookingDesk";
-        public const string FOG_OF_WAR_ID = "fogOfWar";
-        public const string FOG_OF_WAR_SAME_ROOM_RADIUS_ID = "fogOfWarSameRoomRadius";
-        public const string FOG_OF_WAR_OTHER_ROOM_RADIUS_ID = "fogOfWarOtherRoomRadius";
-        public const string FOG_OF_WAR_QUALITY_ID = "fogOfWarQuality";
+        internal const string WRONG_DELIVERY_EXPLOSION_ID = "wrongDeliveryExplosion";
+        internal const string DESTROY_PROTECTORS_ON_FIRE_ID = "destroyProtectorsOnFire";
+        internal const string SOUND_EFFECTS_EXPLOSION_VOLUME_ID = "soundEffectsExplosionVolume";
+        internal const string REHEARSAL_TIME_ID = "rehearsalTime";
+        internal const string RANDOMLY_ROTATE_ICE_CREAM_ID = "randomlyRotateIceCream";
+        internal const string REVERSE_PROGRESS_BARS_ID = "reverseProgressBars";
+        internal const string SIMPLICITY_BOOKING_DESK_ID = "simplicityBookingDesk";
+        internal const string FOG_OF_WAR_ID = "fogOfWar";
+        internal const string FOG_OF_WAR_SAME_ROOM_RADIUS_ID = "fogOfWarSameRoomRadius";
+        internal const string FOG_OF_WAR_OTHER_ROOM_RADIUS_ID = "fogOfWarOtherRoomRadius";
+        internal const string FOG_OF_WAR_QUALITY_ID = "fogOfWarQuality";
+        internal const string HEAD_SIZE_MULTIPLIER_ID = "headSizeMultiplier";
         internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
@@ -182,6 +183,12 @@ namespace YouAskedForIt
                         false,
                         new bool[] { false, true },
                         new string[] { "Default", "It's Rehearsal Time!" })
+                    .AddLabel("Head Size")
+                    .AddOption<float>(
+                        HEAD_SIZE_MULTIPLIER_ID,
+                        1f,
+                        new float[] { 0f, 0.2f, 0.4f, 0.6f, 0.8f, 1f, 1.2f, 1.4f, 1.6f, 1.8f, 2f },
+                        new string[] { "No head", "20%", "40%", "60%", "80%", "100%", "120%", "140%", "160%", "180%", "200%" })
                     .AddLabel("Reverse Patience/Progress Bars >:)")
                     .AddOption<bool>(
                         REVERSE_PROGRESS_BARS_ID,
