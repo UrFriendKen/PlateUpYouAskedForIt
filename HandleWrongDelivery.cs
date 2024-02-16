@@ -1,6 +1,7 @@
 ﻿using Kitchen;
 using KitchenData;
 using KitchenMods;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,8 +13,15 @@ namespace YouAskedForIt
     [StructLayout(LayoutKind.Sequential, Size = 1)]
     public struct CExplodedTable : IComponentData, IModComponent { }
 
-    public class PermanentlyDisableTablesForDay : DaySystem, IModSystem
+    public class HandleWrongDelivery : DaySystem, IModSystem
     {
+        internal enum WrongDeliveryEffect
+        {
+            None,
+            BreakTable,
+            CausesPuking
+        }
+
         EntityQuery Groups;
 
         protected override void Initialise()
@@ -31,7 +39,9 @@ namespace YouAskedForIt
 
         protected override void OnUpdate()
         {
-            if (!Main.PrefManager.Get<bool>(Main.WRONG_DELIVERY_EXPLOSION_ID) || GetOrDefault<SGameTime>().IsPaused)
+            if (!Enum.TryParse(Main.PrefManager.Get<string>(Main.WRONG_DELIVERY_EFFECT_ID), out WrongDeliveryEffect wrongDeliveryEffect) ||
+                wrongDeliveryEffect == WrongDeliveryEffect.None ||
+                GetOrDefault<SGameTime>().IsPaused)
                 return;
 
             using NativeArray<Entity> entities = Groups.ToEntityArray(Allocator.Temp);
@@ -92,12 +102,36 @@ namespace YouAskedForIt
                         continue;
                     }
 
-                    Set<CGroupStartLeaving>(entity);
-                    Set<CGroupStateChanged>(entity);
-                    settings.AddPatience(ref patience, settings.Patience.ItemDeliverBonus);
-                    Set(entity, patience);
-                    Set<CExplodedTable>(assignedTable);
-                    Set<CIsBroken>(assignedTable);
+                    switch (wrongDeliveryEffect)
+                    {
+                        case WrongDeliveryEffect.BreakTable:
+                            Set<CGroupStartLeaving>(entity);
+                            Set<CGroupStateChanged>(entity);
+                            settings.AddPatience(ref patience, settings.Patience.ItemDeliverBonus);
+                            Set(entity, patience);
+                            Set<CExplodedTable>(assignedTable);
+                            Set<CIsBroken>(assignedTable);
+                            break;
+                        case WrongDeliveryEffect.CausesPuking:
+                            Set(entity, new CRequestPuke()
+                            {
+                                Count = 5 * (RequireBuffer(entity, out DynamicBuffer<CGroupMember> members) ? members.Length : 1)
+                            });
+                            if (Require(holder.HeldItem, out CItem cItem) &&
+                                GameData.Main.TryGet(cItem, out Item servedItem) &&
+                                servedItem.DirtiesTo != null)
+                            {
+                                Set(holder.HeldItem, new CChangeItemType()
+                                {
+                                    NewID = servedItem.DirtiesTo.ID
+                                });
+                            }
+                            else
+                            {
+                                EntityManager.DestroyEntity(holder.HeldItem);
+                            }
+                            break;
+                    }
                     break;
                 }
             }
