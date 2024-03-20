@@ -46,5 +46,7 @@ namespace YouAskedForIt.Customs
                 Result = (Item)GDOUtils.GetExistingGDO(-486398094)  // Pot
             }
         };
+
+        public override Item DisposesTo => (Item)GDOUtils.GetExistingGDO(-486398094);   // Pot
     }
 }
