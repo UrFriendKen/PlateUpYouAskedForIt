@@ -25,7 +25,7 @@ namespace YouAskedForIt
         // Mod Version must follow semver notation e.g. "1.2.3"
         public const string MOD_GUID = "IcedMilo.PlateUp.YouAskedForIt";
         public const string MOD_NAME = "You Asked For It!";
-        public const string MOD_VERSION = "0.1.23";
+        public const string MOD_VERSION = "0.1.24";
         public const string MOD_AUTHOR = "IcedMilo";
         public const string MOD_GAMEVERSION = ">=1.1.6";
         // Game version this mod is designed for in semver
@@ -54,6 +54,7 @@ namespace YouAskedForIt
         internal const string FOG_OF_WAR_QUALITY_ID = "fogOfWarQuality";
         internal const string INSIDE_DOOR_COLOR_ID = "insideDoorColor";
         internal const string CUSTOM_PRACTICE_MODE_TEXT = "Rehearsal Time";
+        internal const string BURNING_WATER_ID = "burningWater";
         internal static readonly ViewType ExplosionEffectViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffect");
         internal static readonly ViewType ExplosionEffectSoundViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:ExplosionEffectSound");
         internal static readonly ViewType FlourEmitterViewType = (ViewType)HashUtils.GetInt32HashCode($"{MOD_GUID}:FlourEmitter");
@@ -72,7 +73,8 @@ namespace YouAskedForIt
             AddGameDataObject<HeadLettuce>();
             AddGameDataObject<GlutenFreeWiener>();
             AddGameDataObject<BurnDayBanner>();
-            AddGameDataObject<WaterPot>();
+            if (PrefManager.Get<bool>(BURNING_WATER_ID))
+                AddGameDataObject<WaterPot>();
 
             LogInfo("Done loading game data.");
         }
@@ -100,67 +102,86 @@ namespace YouAskedForIt
             Bundle = mod.GetPacks<AssetBundleModPack>().SelectMany(e => e.AssetBundles).First();
             LogInfo("Done loading asset bundle.");
 
-            // Register custom GDOs
-            AddGameData();
-            Main.LogWarning("You Asked For It Test");
-
             PrefManager = new PreferenceSystemManager(MOD_GUID, MOD_NAME);
             PrefManager
                 .AddLabel("You Asked For It!")
                 .AddSpacer()
                 .AddConditionalBlocker(() => Session.CurrentGameNetworkMode != GameNetworkMode.Host)
-                .AddLabel("Wrong Delivery Breaks Table")
-                .AddOption<string>(
-                    WRONG_DELIVERY_EFFECT_ID,
-                    HandleWrongDelivery.WrongDeliveryEffect.None.ToString(),
-                    Enum.GetNames(typeof(HandleWrongDelivery.WrongDeliveryEffect)),
-                    Enum.GetNames(typeof(HandleWrongDelivery.WrongDeliveryEffect)))
-                .AddLabel("Destroy Rugs and Floor Protectors If On Fire At End of Day")
-                .AddOption<bool>(
-                    DESTROY_PROTECTORS_ON_FIRE_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" })
-                .AddLabel("Randomly Rotate Ice Cream")
-                .AddOption<bool>(
-                    RANDOMLY_ROTATE_ICE_CREAM_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "At Start Of Day" })
-                .AddLabel("Booking Desk Affected By Simplicity")
-                .AddOption<bool>(
-                    SIMPLICITY_BOOKING_DESK_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" })
+                .AddPageSelector(5)
                 .AddSpacer()
-                .AddSubmenu("Fog Of War", "fogOfwar")
-                    .AddLabel("Fog Of War")
+                .StartPagedItem()
+                    .AddLabel("Wrong Delivery Breaks Table")
+                    .AddOption<string>(
+                        WRONG_DELIVERY_EFFECT_ID,
+                        HandleWrongDelivery.WrongDeliveryEffect.None.ToString(),
+                        Enum.GetNames(typeof(HandleWrongDelivery.WrongDeliveryEffect)),
+                        Enum.GetNames(typeof(HandleWrongDelivery.WrongDeliveryEffect)))
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddLabel("Destroy Rugs and Floor Protectors If On Fire At End of Day")
                     .AddOption<bool>(
-                        FOG_OF_WAR_ID,
+                        DESTROY_PROTECTORS_ON_FIRE_ID,
                         false,
                         new bool[] { false, true },
                         new string[] { "Disabled", "Enabled" })
-                    .AddLabel("Same Room Radius")
-                    .AddOption<float>(
-                        FOG_OF_WAR_SAME_ROOM_RADIUS_ID,
-                        3f,
-                        new float[] { 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
-                        new string[] { "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
-                    .AddLabel("Other Room Radius")
-                    .AddOption<float>(
-                        FOG_OF_WAR_OTHER_ROOM_RADIUS_ID,
-                        1.5f,
-                        new float[] { 0f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
-                        new string[] { "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
-                .SubmenuDone()
-                .AddLabel("Serving Board Requires Washing")
-                .AddInfo("Requires restart to take effect")
-                .AddOption<bool>(
-                    SERVING_BOARD_WASHING_ID,
-                    false,
-                    new bool[] { false, true },
-                    new string[] { "Disabled", "Enabled" })
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddLabel("Randomly Rotate Ice Cream")
+                    .AddOption<bool>(
+                        RANDOMLY_ROTATE_ICE_CREAM_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "At Start Of Day" })
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddLabel("Booking Desk Affected By Simplicity")
+                    .AddOption<bool>(
+                        SIMPLICITY_BOOKING_DESK_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "Enabled" })
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddLabel("Serving Board Requires Washing")
+                    .AddInfo("Requires restart to take effect")
+                    .AddOption<bool>(
+                        SERVING_BOARD_WASHING_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "Enabled" })
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddLabel("Burning Water")
+                    .AddInfo("Requires restart to take effect")
+                    .AddOption<bool>(
+                        BURNING_WATER_ID,
+                        false,
+                        new bool[] { false, true },
+                        new string[] { "Disabled", "Enabled" })
+                .PagedItemDone()
+                .StartPagedItem()
+                    .AddSpacer()
+                    .AddSubmenu("Fog Of War", "fogOfwar")
+                        .AddLabel("Fog Of War")
+                        .AddOption<bool>(
+                            FOG_OF_WAR_ID,
+                            false,
+                            new bool[] { false, true },
+                            new string[] { "Disabled", "Enabled" })
+                        .AddLabel("Same Room Radius")
+                        .AddOption<float>(
+                            FOG_OF_WAR_SAME_ROOM_RADIUS_ID,
+                            3f,
+                            new float[] { 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
+                            new string[] { "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
+                        .AddLabel("Other Room Radius")
+                        .AddOption<float>(
+                            FOG_OF_WAR_OTHER_ROOM_RADIUS_ID,
+                            1.5f,
+                            new float[] { 0f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f },
+                            new string[] { "0", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5" })
+                    .SubmenuDone()
+                .PagedItemDone()
                 .AddSpacer()
                 .ConditionalBlockerDone()
                 .AddSubmenu("Client Settings", "clientSettings")
@@ -200,7 +221,10 @@ namespace YouAskedForIt
                 .AddSpacer()
                 .AddSpacer();
             PrefManager.RegisterMenu(PreferenceSystemManager.MenuType.PauseMenu);
-            
+
+            // Register custom GDOs
+            AddGameData();
+
             // Perform actions when game data is built
             Events.BuildGameDataEvent += delegate (object s, BuildGameDataEventArgs args)
             {
